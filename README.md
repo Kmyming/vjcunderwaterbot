@@ -1,5 +1,5 @@
-# VRMC Underwater Bot Project
-Underwater bot project by VJC Robotics and Makers Club, Electronics Spec 2021.
+# VRMC ROV Underwater Bot Project
+ROV Underwater bot project by VJC Robotics and Makers Club, Electronics Spec 2021.
 
 ## Directory
 - **ESP32HTTPGET** -- Code for controller with WiFi connection (server)
