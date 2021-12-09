@@ -6,8 +6,7 @@ int potfinal;
 
 // [For Joystick]
 int Vx = 35;
-int xVal;
-int centerx;
+int centrex;
 float xplusgrad;
 float xplusconstant;
 int xplus;
@@ -17,8 +16,7 @@ float xminusgrad;
 int finalx;
 
 int Vy = 32;
-int yVal;
-int centery;
+int centrey;
 float yplusgrad;
 int yplus;
 int yminus;
@@ -33,18 +31,17 @@ int buttstate;
 int button = 0;
 
 void setup() {
- Serial.begin(115200);
+Serial.begin(115200);
+centrex = analogRead(Vx);
+xplusgrad = 511.0/(4095.0 - centrex);
+xplusconstant = 1023.0 - xplusgrad*4095.0;
+xminusgrad = 512.0/centrex;
 
-centerx = analogRead(Vx);
-xplusgrad = 512.0/(4095.0 - centerx);
-xplusconstant = 1023 - xplusgrad*4095;
-xminusgrad = 512/centerx;
 
-centery = analogRead(Vy);
-yplusgrad = 512.0/(4095.0 - centery);
-yminusgrad = 512/centery;
-yplusconstant = 1023 - yplusgrad*4095;
-
+centrey = analogRead(Vy);
+yplusgrad = 511.0/(4095.0 - centrey);
+yminusgrad = 512.0/centrey;
+yplusconstant = 1023.0 - yplusgrad*4095.0;
 
 
 }
@@ -57,36 +54,30 @@ void loop() {
  Serial.println(potfinal);
  
  // For Joystick
- int x = analogRead(Vx);
- int y = analogRead(Vy);
-
+ x = analogRead(Vx);
+ y = analogRead(Vy);
 
 xplus = xplusgrad*x + xplusconstant;
 xminus = xminusgrad*x;
-if (x > 512) {
-  Serial.print("x ");
+if (x >= centrex) {
   finalx = xplus;
-  Serial.print(finalx);
 } else {
-  Serial.print("x ");
   finalx = xminus;
-  Serial.print(finalx);
 }
+Serial.println("x ");
+Serial.print(finalx);
 
 yplus = yplusgrad*y + yplusconstant;
 yminus = yminusgrad*y;
-if (y > 512) {
-  Serial.print(" y ");
+if (y >= centrey) {
   finaly = yplus;
-  Serial.print(finaly);
 } else {
-  Serial.print(" y ");
   finaly = yminus;
-  Serial.print(finaly);
- 
 }
-Serial.println();
+Serial.print(" y ");
+Serial.print(finaly);
 
+Serial.println();
  // For button
  buttstate = digitalRead(buttpin);
  if (buttstate == 1){
