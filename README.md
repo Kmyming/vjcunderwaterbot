@@ -9,3 +9,6 @@ Underwater bot project by VJC Robotics and Makers Club, Electronics Spec 2021.
 - **controller** -- Code for controls only
 
 - **Split String** -- reference code 
+
+## Updates
+**9/12/21** -- Debugged controller code and trasmitted data from server to client for robot control
