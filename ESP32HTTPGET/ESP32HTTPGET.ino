@@ -121,7 +121,7 @@ Serial.println();
     Serial.println(button);
     }
     
- controls = String(potfinal) + " " + String(button) + " " + String(x) + " " + String(y);
+ controls = String(potfinal) + " " + String(button) + " " + String(finalx) + " " + String(finaly);
  controls.toCharArray(controlChars, 20);
 
 }
