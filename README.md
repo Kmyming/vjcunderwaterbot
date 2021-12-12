@@ -11,4 +11,5 @@ Submersible ROV project by VJC Robotics and Makers Club, Electronics Spec 2021.
 - **Split String** -- reference code 
 
 ## Updates
+**11/12/21** -- Integrated Motor code wih Client code to control one motor wirelessly
 **9/12/21** -- Debugged controller code and trasmitted data from server to client for robot control
