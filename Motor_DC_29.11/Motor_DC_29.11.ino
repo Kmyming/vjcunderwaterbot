@@ -34,7 +34,7 @@ String getValue(String data, char separator, int index)
   }
 
   return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
-} 
+}
 
 String httpGETRequest(const char* serverName) {
   WiFiClient client;
@@ -87,6 +87,8 @@ int DutyCycleL = 0; //Range of 0 to 1023, Left
 int DutyCycleR = 0; //Range of 0 to 1023, Right
 int DutyCycleU = 0; //Range of 0 to 1023, Up
 
+float X, Z, Left, Right;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -97,7 +99,7 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.println("Waiting for connection...");
-    }
+  }
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address:");
   Serial.println(WiFi.localIP());
@@ -114,25 +116,25 @@ void setup() {
   pinMode(magnet, OUTPUT);
   ledcSetup(pwmChannel1, freq, resolution);
   ledcAttachPin(motor1Pin1, pwmChannel1);
-  
+
   ledcSetup(pwmChannel2, freq, resolution);
   ledcAttachPin(motor1Pin2, pwmChannel2);
-  
+
   ledcSetup(pwmChannel3, freq, resolution);
   ledcAttachPin(motor2Pin1, pwmChannel3);
-  
+
   ledcSetup(pwmChannel4, freq, resolution);
   ledcAttachPin(motor2Pin2, pwmChannel4);
-  
+
   ledcSetup(pwmChannel5, freq, resolution);
   ledcAttachPin(motor3Pin1, pwmChannel5);
-  
+
   ledcSetup(pwmChannel6, freq, resolution);
   ledcAttachPin(motor3Pin2, pwmChannel6);
-  
+
   ledcSetup(pwmChannel7, freq, resolution);
   ledcAttachPin(motor4Pin1, pwmChannel7);
-  
+
   ledcSetup(pwmChannel8, freq, resolution);
   ledcAttachPin(motor4Pin2, pwmChannel8);
 
@@ -141,87 +143,94 @@ void setup() {
 void loop() {
   // Put your main code here, to run repeatedly:
   // Insert the recieving code here
-   unsigned long currentMillis = millis();
-    //check WiFi connection status
-    if (WiFi.status() == WL_CONNECTED) {
-      getRequest = httpGETRequest(serverNamepot);
-      xvalue = getValue(getRequest, ' ', 3);
-      yvalue = getValue(getRequest, ' ', 2);
-      buttvalue = getValue(getRequest, ' ', 1);
-      potvalue = getValue(getRequest, ' ', 0);
-      xvalue.toInt();
-      yvalue.toInt();
-      buttvalue.toInt();
-      potvalue.toInt();
-    Serial.print ("x ");
-    Serial.print(xvalue);
-    Serial.print(" y "); 
-    Serial.print(yvalue);
-    Serial.println();
-    Serial.println(buttvalue);
-    Serial.println(potvalue);
-    }
-    else {
-      Serial.println("WiFi Disconnected");
-    }
+  unsigned long currentMillis = millis();
+  //check WiFi connection status
+  if (WiFi.status() == WL_CONNECTED) {
+    getRequest = httpGETRequest(serverNamepot);
+    xvalue = getValue(getRequest, ' ', 3);
+    yvalue = getValue(getRequest, ' ', 2);
+    buttvalue = getValue(getRequest, ' ', 1);
+    potvalue = getValue(getRequest, ' ', 0);
+    /*   xvalue.toInt();
+       yvalue.toInt();
+       buttvalue.toInt();
+       potvalue.toInt();
+      Serial.print ("x ");
+      Serial.print(xvalue);
+      Serial.print(" y ");
+      Serial.print(yvalue);
+      Serial.println();
+      Serial.println(buttvalue);
+      Serial.println(potvalue);*/
+  }
+  else {
+    Serial.println("WiFi Disconnected");
+  }
   // Should receive 2 integers for joystick, 1 integer for electromagnet, 1 integer for depth
-  xzmovement(xvalue.toInt(), yvalue.toInt()); //Placeholders
-  // ymovement(0); //Placeholders
+  xzmovement(xvalue.toFloat(), yvalue.toFloat()); //Placeholders
+  ymovement(int(potvalue)); //Placeholders
   // Electromagnet(0); //Placeholders
-  
+
 }
 
-void xzmovement(int xvalue, int yvalue) {
+void xzmovement(float xvalue, float yvalue) {
   /*
      Will recieve a value from 0 to 1023
      If 512 < value, move forward
      If 512 > value, move backward
   */
-  float X = (xvalue/1023.0) *2 -1;
-  float Z = (yvalue/1023.0) *2 -1;
-  float Left = X + Z;
-  float Right = X - Z;
-  if (Left > 1){
+
+  X = map(xvalue, 0, 1023, -1, 1);
+  Z = map(yvalue, 0, 1023, -1, 1);
+  //Z = (yvalue / 1023.0) * 2 - 1;
+  Left = X + Z;
+  Right = X - Z;
+  if (Left > 1) {
     Left = 1;
-  } else if (Left < -1){
+  } else if (Left < -1) {
     Left = -1;
   } else if (Right > 1) {
     Right = 1;
-  } else if (Right < -1){
+  } else if (Right < -1) {
     Right = -1;
-  }
-  DutyCycleL = Left*1023.0;
-  DutyCycleR = Right*1023.0;
-  Serial.println(String(DutyCycleL)+ "  " +String(DutyCycleR));
-  if (DutyCycleL >= 0){
+  } 
+
+  //DutyCycleL = Left * 1023.0;
+  //DutyCycleR = Right * 1023.0;
+  DutyCycleL = map(Left, -1, 1, -1023, 1023);
+  DutyCycleR = map(Right, -1, 1, -1023, 1023);
+  Serial.println(String(DutyCycleL) + "  " + String(DutyCycleR));
+  if (DutyCycleL >= 0) {
     ledcWrite(pwmChannel3, DutyCycleL);
     ledcWrite(pwmChannel4, 0);
-  } else if (DutyCycleL < 0){
+  } else if (DutyCycleL < 0) {
     ledcWrite(pwmChannel3, 0);
     ledcWrite(pwmChannel4, abs(DutyCycleL));
   }
-  if (DutyCycleR >= 0){
+  
+  if (DutyCycleR >= 0) {
     ledcWrite(pwmChannel1, DutyCycleR);
     ledcWrite(pwmChannel2, 0);
-  } else if (DutyCycleL < 0){
+  } else if (DutyCycleR < 0) {
     ledcWrite(pwmChannel1, 0);
     ledcWrite(pwmChannel2, abs(DutyCycleR));
-  }  
+  }
+  //delay(700);
 }
 
-/*void ymovement(int potvalue){
+void ymovement(int potvalue){
   DutyCycleU = ReceivedY;
   ledcWrite(pwmChannel5, DutyCycleU);  //
   ledcWrite(pwmChannel6, 0);           // Need to confirm which is up direction and which is down, placeholder values for now
   ledcWrite(pwmChannel7, DutyCycleU);  //
   ledcWrite(pwmChannel8, 0);           //
-}
+  }
 
-void Electromagnet(int buttvalue){
+/*  void Electromagnet(int buttvalue){
   //Need to check the direction and polarity of this
   if (ReceivedE%2 == 0){
     digitalWrite(magnet, HIGH);
   } else if (ReceivedE%2 != 0){
     digitalWrite(magnet, LOW);
   }
-}*/
+  }*/
