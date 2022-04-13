@@ -113,19 +113,21 @@ Serial.println(finaly);
 
  // For button
  buttstate = digitalRead(buttpin);
- 
+
   if (buttstate == 1) {
     button++;
+if (button==2){
+button = 0;
+}
     while (buttstate == 1)
     {
      buttstate = digitalRead(buttpin);
       }
-    
+
   } 
   else {
   }
 
  controls = String(potfinal) + " " + String(button) + " " + String(finalx) + " " + String(finaly);
  controls.toCharArray(controlChars, 20);
-
 }

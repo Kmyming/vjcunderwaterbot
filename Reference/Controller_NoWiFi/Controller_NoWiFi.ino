@@ -51,7 +51,9 @@ void loop() {
  potvalue = analogRead(potpin);
  realpot = map(potvalue, 0, 4095, 0, 1023);
  potfinal = 1023 - realpot;
- Serial.println(potfinal);
+ Serial.println();
+ Serial.print("potentiometer reading: ");
+ Serial.print(potfinal);
  
  // For Joystick
  x = analogRead(Vx);
@@ -64,7 +66,8 @@ if (x >= centrex) {
 } else {
   finalx = xminus;
 }
-Serial.println("x ");
+Serial.println();
+Serial.print("x ");
 Serial.print(finalx);
 
 yplus = yplusgrad*y + yplusconstant;
@@ -78,13 +81,22 @@ Serial.print(" y ");
 Serial.print(finaly);
 
 Serial.println();
- // For button
+// For button
  buttstate = digitalRead(buttpin);
- if (buttstate == 1){
+
+  if (buttstate == 1) {
     button++;
-    Serial.println(button);
-    delay(300);
-  } else{
-    Serial.println(button);
-    }
+if (button==2){
+button = 0;
+}
+    while (buttstate == 1)
+    {
+     buttstate = digitalRead(buttpin);
+      }
+
+  } 
+  else {
+  }
+Serial.println(button);
+delay(100);
 }
